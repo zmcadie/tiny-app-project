@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+  <% const output = [] %>
+  <% for (key in urls)  {
+    output.push(`${urls[key]} : ${key}`)
+  }%>
+  <p><%- output.join(' _____ ') %></p>
+</body>
+</html>
