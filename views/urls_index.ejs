@@ -4,10 +4,19 @@
   <title>TinyApp</title>
 </head>
 <body>
-  <% const output = [] %>
-  <% for (key in urls)  {
-    output.push(`${urls[key]} : ${key}`)
-  }%>
-  <p><%- output.join(' _____ ') %></p>
+  <header>
+    <% include partials/_header %>
+  </header>
+  <main>
+    <% const output = [] %>
+    <% for (key in urls)  {
+      output.push(`${urls[key]} : ${key}`)
+    }%>
+    <p><%- output.join(' _____ ') %></p>
+    <p><a>Click to shorten URL</a></p>
+  </main>
+  <footer>
+    <% include partials/_footer %>
+  </footer>
 </body>
 </html>
