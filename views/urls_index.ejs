@@ -7,12 +7,18 @@
     <% include partials/_header %>
     <ul>
       <% for (key in urls)  { %>
-        <li><%= `${urls[key]} : ${key}` %><form method="POST" action="/urls/<%=key%>/delete">  <button type='submit'>DELETE</button>
-        </form></li>
+        <li>
+          <%= `${urls[key]} : ${key}` %>
+          &nbsp&nbsp&nbsp&nbsp
+          <a href="/urls/<%=key%>">Edit</a>
+          &nbsp&nbsp&nbsp&nbsp
+          <form method="POST" action="/urls/<%=key%>/delete" style="display:inline">
+            <button type='submit'>DELETE</button>
+          </form>
+        </li>
       <% }%>
     </ul>
     <form action="/urls/new"><button>Click to shorten URL</button></form>
-
     <% include partials/_footer %>
 </body>
 </html>

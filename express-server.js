@@ -6,6 +6,13 @@ const PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+const addProtocol = (URL) => {
+  if (URL !== /^https?:\/\//) {
+    let longURL = `https://${URL}`;
+    return longURL
+  };
+  return URL;
+};
 
 // enables ejs templates (using render, etc...)
 app.set('view engine', 'ejs');
@@ -49,13 +56,18 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.post("/urls/:id", (req, res) => {
+  let longURL = addProtocol(req.body.longURL);
+  urlDatabase[req.params.id] = longURL;
+  res.redirect('/urls')
+})
+
 // handles post requests from new url form
 app.post("/urls", (req, res) => {
   const shortened = generateRandomString();
-  let longURL = req.body.longURL;
-  if (longURL !== /^https?:\/\//) { longURL = `https://${longURL}` };
+  let longURL = addProtocol(req.body.longURL);
   urlDatabase[shortened] = longURL;
-  res.send(res.redirect(`http://localhost:8080/urls/${shortened}`));
+  res.redirect(`/urls/${shortened}`);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
