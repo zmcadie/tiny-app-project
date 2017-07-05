@@ -10,11 +10,13 @@ app.use(bodyParser.urlencoded({extended: true}));
 // enables ejs templates (using render, etc...)
 app.set('view engine', 'ejs');
 
+// for storing shortened URLs, with presets
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
+// generates random 6 char string to use as short url
 const generateRandomString = () => {
   let output = '';
   const base = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -25,6 +27,7 @@ const generateRandomString = () => {
   return output;
 };
 
+// stand-in root path / home-page
 app.get('/', (req, res) => {
   res.send('hello')
 });
@@ -48,13 +51,14 @@ app.get("/urls/:id", (req, res) => {
 
 // handles post requests from new url form
 app.post("/urls", (req, res) => {
-  const shortened = generateRandomString()
-  let longURL = req.body.longURL
-  if (longURL !== /^https?:\/\//) { longURL = `https://${longURL}` }
-  urlDatabase[shortened] = longURL
+  const shortened = generateRandomString();
+  let longURL = req.body.longURL;
+  if (longURL !== /^https?:\/\//) { longURL = `https://${longURL}` };
+  urlDatabase[shortened] = longURL;
   res.send(res.redirect(`http://localhost:8080/urls/${shortened}`));
 });
 
+// redirects to website stored in database
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]
   res.redirect(longURL);
