@@ -49,7 +49,9 @@ app.get("/urls/:id", (req, res) => {
 // handles post requests from new url form
 app.post("/urls", (req, res) => {
   const shortened = generateRandomString()
-  urlDatabase[shortened] = req.body.longURL
+  let longURL = req.body.longURL
+  if (longURL !== /^https?:\/\//) { longURL = `https://${longURL}` }
+  urlDatabase[shortened] = longURL
   res.send(res.redirect(`http://localhost:8080/urls/${shortened}`));
 });
 
