@@ -48,8 +48,14 @@ app.get("/urls/:id", (req, res) => {
 
 // handles post requests from new url form
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  const shortened = generateRandomString()
+  urlDatabase[shortened] = req.body.longURL
+  res.send(res.redirect(`http://localhost:8080/urls/${shortened}`));
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL]
+  res.redirect(longURL);
 });
 
 // tells server to listen on pre-defined port
