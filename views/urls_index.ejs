@@ -5,13 +5,13 @@
 </head>
 <body>
     <% include partials/_header %>
-
-    <% const output = [] %>
-    <% for (key in urls)  {
-      output.push(`${urls[key]} : ${key}`)
-    }%>
-    <p><%- output.join(' _____ ') %></p>
-    <p><a>Click to shorten URL</a></p>
+    <ul>
+      <% for (key in urls)  { %>
+        <li><%= `${urls[key]} : ${key}` %><form method="POST" action="/urls/<%=key%>/delete">  <button type='submit'>DELETE</button>
+        </form></li>
+      <% }%>
+    </ul>
+    <form action="/urls/new"><button>Click to shorten URL</button></form>
 
     <% include partials/_footer %>
 </body>

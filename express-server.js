@@ -58,6 +58,11 @@ app.post("/urls", (req, res) => {
   res.send(res.redirect(`http://localhost:8080/urls/${shortened}`));
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect('http://localhost:8080/urls');
+});
+
 // redirects to website stored in database
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]
