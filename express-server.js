@@ -26,6 +26,15 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+//for storing user info
+const users = {
+  01: {
+    id: 01,
+    email: 'admin@tinyapp.com',
+    password: 'admin'
+  }
+};
+
 // generates random 6 char string to use as short url
 const generateRandomString = () => {
   let output = '';
@@ -40,6 +49,10 @@ const generateRandomString = () => {
 // stand-in root path / home-page
 app.get('/', (req, res) => {
   res.redirect('/urls');
+});
+
+app.get('/register', (req, res) => {
+  res.render('register');
 });
 
 // passes defined var to ejs template, displays with .render
@@ -67,6 +80,22 @@ app.get("/urls/:id", (req, res) => {
     username: req.cookies["username"]
   };
   res.render("urls_show", templateVars);
+});
+
+app.post("/register", (req, res) => {
+  if (req.body.value === "Don't register") {
+    res.redirect("/urls");
+  } else {
+    const newUser = {
+      id: generateRandomString(),
+      email: req.body.email,
+      password: req.body.password
+    };
+    users[newUser.id] = newUser
+    res.cookie('user_id', newUser.id)
+  }
+  res.redirect('/');
+  console.log(users)
 });
 
 // allows user to logout and clears username cookie
