@@ -9,14 +9,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
-// checks if url has http(s):// and adds if false
-const addProtocol = (URL) => {
-  if (!/https?:\/\//.test(URL)) {
-    URL = `https://${URL}`;
-  }
-  return URL;
-};
-
 // enables ejs templates (using render, etc...)
 app.set('view engine', 'ejs');
 
@@ -44,6 +36,24 @@ const generateRandomString = () => {
     output += base[index];
   }
   return output;
+};
+
+// checks if url has http(s):// and adds if false
+const addProtocol = (URL) => {
+  if (!/https?:\/\//.test(URL)) {
+    URL = `https://${URL}`;
+  }
+  return URL;
+};
+
+// check if given email is in users
+const isUser = (email) => {
+  for (user in users) {
+    if (users[user].email === email) {
+      return true;
+    }
+  }
+  return false;
 };
 
 // stand-in root path / home-page
@@ -82,20 +92,27 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// allows don't register button on register page
+app.post("/dontRegister", (req, res) => {
+  res.redirect("/urls");
+});
+
+// register form on register page, handles errors
 app.post("/register", (req, res) => {
-  if (req.body.value === "Don't register") {
-    res.redirect("/urls");
-  } else {
+  if (isUser(req.body.email)) {
+    res.status(400).alert("Sorry user with that email already exists");
+  } else if (req.body.email && req.body.password){
     const newUser = {
       id: generateRandomString(),
       email: req.body.email,
       password: req.body.password
     };
-    users[newUser.id] = newUser
-    res.cookie('user_id', newUser.id)
+    users[newUser.id] = newUser;
+    res.cookie('user_id', newUser.id);
+    res.redirect('/urls');
+  } else {
+    res.status(400).send("Email and Password cannot be empty");
   }
-  res.redirect('/');
-  console.log(users)
 });
 
 // allows user to logout and clears username cookie
