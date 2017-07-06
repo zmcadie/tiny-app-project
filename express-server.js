@@ -12,8 +12,7 @@ app.use(cookieParser());
 // checks if url has http(s):// and adds if false
 const addProtocol = (URL) => {
   if (!/https?:\/\//.test(URL)) {
-    let longURL = `https://${URL}`;
-    return longURL;
+    URL = `https://${URL}`;
   }
   return URL;
 };
