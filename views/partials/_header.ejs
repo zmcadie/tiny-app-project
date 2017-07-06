@@ -1,7 +1,13 @@
 <!-- views/partials/_header.ejs -->
 
 <h4>_/\/&macr\___/\_&nbspWelcome to TinyApp&nbsp_/\__/&macr&macr\_/\_</h4>
+<% if (!userEmail) { %>
+  <a href="/login">Login</a>&nbsp&nbsp<a href="/register">Register</a>
+<% } else { %>
+  <form method="POST" action="/logout" style="display:inline";>
+    <input type="submit" value="Logout">
+  </form>
+<% } %>
 <br>
-<a href="/login">Login</a>&nbsp&nbsp<a href="/register">Register</a>
 <br>
 <br>
