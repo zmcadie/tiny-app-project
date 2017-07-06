@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 // sets preffered port
-const PORT = process.env.PORT || 8080; // default port 8080
+const PORT = process.env.PORT || 8080;
 // allows access to POST requests
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -11,10 +11,10 @@ app.use(cookieParser());
 
 // checks if url has http(s):// and adds if false
 const addProtocol = (URL) => {
-  if (URL !== /^https?:\/\//) {
+  if (!/https?:\/\//.test(URL)) {
     let longURL = `https://${URL}`;
     return longURL;
-  };
+  }
   return URL;
 };
 
@@ -34,13 +34,13 @@ const generateRandomString = () => {
   for (let i = 0; i < 6; i++) {
     const index = Math.floor(Math.random() * 62);
     output += base[index];
-  };
+  }
   return output;
 };
 
 // stand-in root path / home-page
 app.get('/', (req, res) => {
-  res.redirect('/urls')
+  res.redirect('/urls');
 });
 
 // passes defined var to ejs template, displays with .render
@@ -74,7 +74,7 @@ app.get("/urls/:id", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect('/urls');
-})
+});
 
 // allows login from the header and sets cookie
 app.post("/login", (req, res) => {
@@ -86,7 +86,7 @@ app.post("/login", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   let longURL = addProtocol(req.body.longURL);
   urlDatabase[req.params.id] = longURL;
-  res.redirect('/urls')
+  res.redirect('/urls');
 });
 
 // handles post requests from new url form
@@ -105,7 +105,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // redirects to website stored in database
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL]
+  let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
 
