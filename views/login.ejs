@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+  <h4>_/\/&macr\___/\_&nbspWelcome to TinyApp&nbsp_/\__/&macr&macr\_/\_</h4>
+  <% if (userEmail === undefined) { %>
+    <table>
+      <form action="/login" method="POST";>
+        <tr>
+          <td><label for="email">Enter email</label></td>
+          <td>&nbsp:&nbsp</td>
+          <td><input id="email" type="email" name="email" placeholder="example@tinyapp.com" style="width: 150px"></td>
+        </tr>
+        <tr>
+          <td><label for="password">Password</label></td>
+          <td>&nbsp:&nbsp</td>
+          <td><input id="password" type="password" name="password" placeholder="*****" style="width: 100px"></td>
+        </tr>
+        <tr><td>&nbsp</td></tr>
+        <tr>
+          <td><input type="submit" value="Login" style="width: 75px"></td>
+        </tr>
+      </form>
+    </table>
+  <% } else { %>
+    Logged in as: <%= userEmail %> &nbsp&nbsp
+    <form method="POST" action="/logout" style="display:inline";>
+      <input type="submit" value="Logout">
+    </form>
+  <% } %>
+</body>
+</html>

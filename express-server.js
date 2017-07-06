@@ -56,12 +56,29 @@ const isUser = (email) => {
   return false;
 };
 
+const checkPassword = (email, password) => {
+  if (users[getIdByEmail(email)].password === password) {
+    return true;
+  }
+  return false
+};
+
 const getEmailById = (id) => {
   let user = users[id];
   if (!user) {
     return;
   }
   return user.email;
+};
+
+const getIdByEmail = (email) => {
+  let id = undefined;
+  for (user in users) {
+    if (users[user].email === email) {
+      id = user;
+    }
+  }
+  return id;
 };
 
 // stand-in root path / home-page
@@ -72,6 +89,13 @@ app.get('/', (req, res) => {
 app.get('/register', (req, res) => {
   res.render('register');
 });
+
+app.get('/login', (req, res) => {
+  let templateVars = {
+    userEmail: getEmailById(req.cookies["user_id"])
+  }
+  res.render('login', templateVars)
+})
 
 // passes defined var to ejs template, displays with .render
 app.get('/urls', (req, res) => {
@@ -109,6 +133,7 @@ app.post("/dontRegister", (req, res) => {
 app.post("/register", (req, res) => {
   if (isUser(req.body.email)) {
     res.status(400).send("Sorry user with that email already exists");
+    return;
   } else if (req.body.email && req.body.password){
     const newUser = {
       id: generateRandomString(),
@@ -129,10 +154,21 @@ app.post("/logout", (req, res) => {
   res.redirect('/urls');
 });
 
-// allows login from the header and sets cookie
+// allows login from login page and sets cookie
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+  const email = req.body.email
+  const password = req.body.password
+  const id = getIdByEmail(email)
+  if (!isUser(email)) {
+    res.status(403).send("Email or Password incorrect");
+    return;
+  } else if (!checkPassword(email, password)) {
+    res.status(403).send("Email or Password incorrect");
+    return;
+  } else {
+    res.cookie('user_id', id);
+    res.redirect('/');
+  };
 });
 
 // allows form fillout to update urlDatabase
