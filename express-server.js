@@ -56,6 +56,14 @@ const isUser = (email) => {
   return false;
 };
 
+const getEmailById = (id) => {
+  let user = users[id];
+  if (!user) {
+    return;
+  }
+  return user.email;
+};
+
 // stand-in root path / home-page
 app.get('/', (req, res) => {
   res.redirect('/urls');
@@ -69,7 +77,7 @@ app.get('/register', (req, res) => {
 app.get('/urls', (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    userEmail: getEmailById(req.cookies["user_id"])
   };
   res.render("urls_index", templateVars);
 });
@@ -77,7 +85,7 @@ app.get('/urls', (req, res) => {
 // shows form to shorten url
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"]
+    userEmail: getEmailById(req.cookies["user_id"])
   };
   res.render("urls_new", templateVars);
 });
@@ -87,7 +95,7 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
     urls: urlDatabase,
-    username: req.cookies["username"]
+    userEmail: getEmailById(req.cookies["user_id"])
   };
   res.render("urls_show", templateVars);
 });
@@ -100,7 +108,7 @@ app.post("/dontRegister", (req, res) => {
 // register form on register page, handles errors
 app.post("/register", (req, res) => {
   if (isUser(req.body.email)) {
-    res.status(400).alert("Sorry user with that email already exists");
+    res.status(400).send("Sorry user with that email already exists");
   } else if (req.body.email && req.body.password){
     const newUser = {
       id: generateRandomString(),
