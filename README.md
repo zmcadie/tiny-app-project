@@ -4,9 +4,14 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["The /urls page shows an index of all the users shortened links with stats."](https://github.com/zmcadie/tiny-app-project/blob/master/docs/urls-index.png?raw=true)
-!["Screenshot of Login page."](https://github.com/zmcadie/tiny-app-project/blob/master/docs/login-page.png?raw=true)
-!["Users can update the destination of shortened links they've made."](https://github.com/zmcadie/tiny-app-project/blob/master/docs/link-update-page.png?raw=true)
+!["Urls index page"](https://github.com/zmcadie/tiny-app-project/blob/master/docs/urls-index.png?raw=true)
+The /urls page shows an index of all the users shortened links with stats.
+&nbsp
+!["Screenshot of Login page"](https://github.com/zmcadie/tiny-app-project/blob/master/docs/login-page.png?raw=true)
+Are you logged in?
+&nbsp
+!["Update link page"](https://github.com/zmcadie/tiny-app-project/blob/master/docs/link-update-page.png?raw=true)
+Users can update the destination of shortened links they've made.
 
 ## Dependencies
 
