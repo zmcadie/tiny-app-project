@@ -6,7 +6,7 @@
 </head>
 <body>
   <h4>_/\/&macr\___/\_&nbspWelcome to TinyApp&nbsp_/\__/&macr&macr\_/\_</h4>
-  <% if (userEmail === undefined) { %>
+  <% if (!userEmail) { %>
     <table>
       <form action="/login" method="POST";>
         <tr>
@@ -23,8 +23,13 @@
         <tr>
           <td><input type="submit" value="Login" style="width: 75px"></td>
         </tr>
+        <tr><td>&nbsp</td></tr>
       </form>
     </table>
+    <form action="/register" method="GET">
+      <label>Not a user?</label>
+      <button>Register</button>
+    </form>
   <% } else { %>
     Logged in as: <%= userEmail %> &nbsp&nbsp
     <form method="POST" action="/logout" style="display:inline";>

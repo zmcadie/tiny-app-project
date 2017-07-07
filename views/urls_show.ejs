@@ -6,8 +6,20 @@
 <body>
   <% include partials/_header %>
   <% if (urls[shortUrl].userId === userId) { %>
-    <h2>shortURL: <%=`${shortUrl}` %></h2>
-
+    <h2>Your link: <%=`/u/${shortUrl}` %></h2>
+    <table>
+    <tr>
+      <td>Views</td>
+      <td>&nbsp:&nbsp</td>
+      <td><%= urls[shortUrl].visits %></td>
+    </tr>
+    <tr>
+      <td>Created on</td>
+      <td>&nbsp:&nbsp</td>
+      <td><%= urls[shortUrl].created %></td>
+    </tr>
+    </table>
+    <br>
     <form action="/urls/<%= shortUrl %>" method="POST">
       <input id="longURL" type="text" name="longURL" value="<%= urls[shortUrl].url %>" style="width: 300px">
       <input type="submit" value="Update">

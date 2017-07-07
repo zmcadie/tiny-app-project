@@ -10,20 +10,24 @@
         <tr>
           <td><%= `${urls[key].url} ` %> </td>
           <td>&nbsp:&nbsp</td>
-          <td><%= ` ${key}` %></td>
+          <td><%= ` /u/${key}` %></td>
           <td>&nbsp&nbsp&nbsp&nbsp</td>
           <td><a href="/urls/<%=key%>">Edit</a></td>
           <td>&nbsp&nbsp&nbsp</td>
           <td><form method="POST" action="/urls/<%=key%>/delete" style="display:inline">
             <button type='submit'>DELETE</button>
           </form></td>
+          <td>&nbsp&nbsp</td>
+          <td><%= `Views: ${urls[key].visits}` %></td>
+          <td>&nbsp&nbsp</td>
+          <td><%= `Created on: ${urls[key].created}` %></td>
         </tr>
       <% }%>
       <tr>
         <td>&nbsp</td>
       </tr>
     </table>
-    <form action="/urls/new"><button>Make new TinyURL</button></form>
+    <form action="/urls/new" method="GET"><button>Make new TinyURL</button></form>
     <% include partials/_footer %>
 </body>
 </html>
