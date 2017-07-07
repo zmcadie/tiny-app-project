@@ -193,7 +193,10 @@ app.get("/urls/:id", (req, res) => {
 // allows new user registration if email not registered
 // does not allow blank submission
 app.post("/register", (req, res) => {
-  if (isUser(req.body.email)) {
+  if (req.session.userId) {
+    res.status(400).send("Your already logged in!");
+    return;
+  } else if (isUser(req.body.email)) {
     res.status(400).send("Sorry user with that email already exists");
     return;
   } else if (req.body.email && req.body.password){
@@ -221,7 +224,10 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const id = getIdByEmail(email);
-  if (!isUser(email)) {
+  if (req.session.userId) {
+    res.status(400).send("You're already logged in!");
+    return;
+  } else if (!isUser(email)) {
     res.status(403).send("Email or Password incorrect");
     return;
   } else if (!checkPassword(email, password)) {
@@ -239,6 +245,8 @@ app.post("/urls/:id", (req, res) => {
   if (urlDatabase[req.params.id].userId === req.session.userId) {
     urlDatabase[req.params.id].url = longURL;
     res.redirect('/urls');
+  } else if (!req.session.userId) {
+    res.status(401).send("You must be logged in to view this page.");
   } else {
     res.status(400).send("You do not have permission to edit that URL");
   }
@@ -246,21 +254,29 @@ app.post("/urls/:id", (req, res) => {
 
 // updates url database when new url created
 app.post("/urls", (req, res) => {
-  const shortened = generateRandomString();
-  let longURL = addProtocol(req.body.longURL);
-  const date = new Date();
-  urlDatabase[shortened] = {
-    url: longURL,
-    userId: req.session.userId,
-    visits: 0,
-    created: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
-  };
-  res.redirect(`/urls/${shortened}`);
+  if (!req.session.userId) {
+    res.status(401).send("You must be logged in to shorten URLs.");
+    return;
+  } else {
+    const shortened = generateRandomString();
+    let longURL = addProtocol(req.body.longURL);
+    const date = new Date();
+    urlDatabase[shortened] = {
+      url: longURL,
+      userId: req.session.userId,
+      visits: 0,
+      created: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+    };
+    res.redirect(`/urls/${shortened}`);
+  }
 });
 
 // allows button to delete from urlDatabase
 app.post("/urls/:id/delete", (req, res) => {
-  if (urlDatabase[req.params.id].userId === req.session.userId) {
+  if (!req.params.userId) {
+    res.status(401).send("You must be logged in to do that!");
+    return;
+  } else if (urlDatabase[req.params.id].userId === req.session.userId) {
     delete urlDatabase[req.params.id];
     res.redirect('/urls');
   } else {
