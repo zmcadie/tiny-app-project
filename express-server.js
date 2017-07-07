@@ -6,8 +6,11 @@ const PORT = process.env.PORT || 8080;
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 // allows use of cookies
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
+const cookieSession = require("cookie-session");
+app.use(cookieSession({
+  user_id: 'user_id',
+  keys: ['purple', 'elephant']
+}));
 // includes bcrypt
 const bcrypt = require('bcrypt');
 
@@ -18,18 +21,18 @@ app.set('view engine', 'ejs');
 const urlDatabase = {
   "b2xVn2": {
     url: "http://www.lighthouselabs.ca",
-    userId: 01
+    userId: "d7G88i"
   },
   "9sm5xK": {
     url: "http://www.google.com",
-    userId: 01
+    userId: "d7G88i"
   }
 };
 
 //for storing user info
 const users = {
-  01: {
-    id: 01,
+  d7G88i: {
+    id: 'd7G88i',
     email: 'admin@tinyapp.com',
     password: bcrypt.hashSync('admin', 10)
   }
@@ -118,7 +121,7 @@ app.get('/register', (req, res) => {
 
 app.get('/login', (req, res) => {
   let templateVars = {
-    userEmail: getEmailById(req.cookies["user_id"])
+    userEmail: getEmailById(req.session.user_id)
   }
   res.render('login', templateVars)
 })
@@ -126,8 +129,8 @@ app.get('/login', (req, res) => {
 // passes defined var to ejs template, displays with .render
 app.get('/urls', (req, res) => {
   let templateVars = {
-    userEmail: getEmailById(req.cookies["user_id"]),
-    urls: urlsForUser(req.cookies["user_id"])
+    userEmail: getEmailById(req.session.user_id),
+    urls: urlsForUser(req.session.user_id)
   };
   res.render("urls_index", templateVars);
 });
@@ -135,7 +138,7 @@ app.get('/urls', (req, res) => {
 // shows form to shorten url
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    userEmail: getEmailById(req.cookies["user_id"])
+    userEmail: getEmailById(req.session.user_id)
   };
   if (templateVars.userEmail === undefined) {
     res.redirect('/login');
@@ -149,8 +152,8 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortUrl: req.params.id,
     urls: urlDatabase,
-    userEmail: getEmailById(req.cookies["user_id"]),
-    userId: req.cookies["user_id"]
+    userEmail: getEmailById(req.session.user_id),
+    userId: req.session.user_id
   };
   res.render("urls_show", templateVars);
 });
@@ -172,7 +175,7 @@ app.post("/register", (req, res) => {
       password: bcrypt.hashSync(req.body.password, 10)
     };
     users[newUser.id] = newUser;
-    res.cookie('user_id', newUser.id);
+    req.session.user_id = newUser.id;
     res.redirect('/urls');
   } else {
     res.status(400).send("Email and Password cannot be empty");
@@ -181,7 +184,7 @@ app.post("/register", (req, res) => {
 
 // allows user to logout and clears username cookie
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/urls');
 });
 
@@ -197,7 +200,7 @@ app.post("/login", (req, res) => {
     res.status(403).send("Email or Password incorrect");
     return;
   } else {
-    res.cookie('user_id', id);
+    req.session.user_id = id;
     res.redirect('/');
   };
 });
@@ -205,7 +208,7 @@ app.post("/login", (req, res) => {
 // allows form fillout to update urlDatabase
 app.post("/urls/:id", (req, res) => {
   let longURL = addProtocol(req.body.longURL);
-  if (urlDatabase[req.params.id].userId == req.cookies["user_id"]) {
+  if (urlDatabase[req.params.id].userId == req.session.user_id) {
     urlDatabase[req.params.id].url = longURL;
     res.redirect('/urls');
   } else {
@@ -219,14 +222,14 @@ app.post("/urls", (req, res) => {
   let longURL = addProtocol(req.body.longURL);
   urlDatabase[shortened] = {
     url: longURL,
-    userId: req.cookies["user_id"]
+    userId: req.session.user_id
   };
   res.redirect(`/urls/${shortened}`);
 });
 
 // allows button to delete from urlDatabase
 app.post("/urls/:id/delete", (req, res) => {
-  if (urlDatabase[req.params.id].userId === req.cookies["user_id"]) {
+  if (urlDatabase[req.params.id].userId === req.session.user_id) {
     delete urlDatabase[req.params.id];
     res.redirect('/urls');
   } else {

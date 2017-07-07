@@ -5,7 +5,8 @@
   <a href="/login">Login</a>&nbsp&nbsp<a href="/register">Register</a>
 <% } else { %>
   <form method="POST" action="/logout" style="display:inline";>
-    <input type="submit" value="Logout">
+    <label for="logout"><b>Logged in as: </b><%= userEmail %></label>
+    <input id="logout" type="submit" value="Logout">
   </form>
 <% } %>
 <br>
