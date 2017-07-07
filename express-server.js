@@ -14,8 +14,14 @@ app.set('view engine', 'ejs');
 
 // for storing shortened URLs, with presets
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    url: "http://www.lighthouselabs.ca",
+    userId: 01
+  },
+  "9sm5xK": {
+    url: "http://www.google.com",
+    userId: 01
+  }
 };
 
 //for storing user info
@@ -40,10 +46,14 @@ const generateRandomString = () => {
 
 // checks if url has http(s):// and adds if false
 const addProtocol = (URL) => {
+  let newUrl = URL
   if (!/https?:\/\//.test(URL)) {
-    URL = `https://${URL}`;
+    if (!/www\./.test(URL)) {
+      newUrl = `www.${newUrl}`
+    }
+    newUrl = `https://${newUrl}`;
   }
-  return URL;
+  return newUrl;
 };
 
 // check if given email is in users
@@ -56,6 +66,7 @@ const isUser = (email) => {
   return false;
 };
 
+// checks if given email and password match
 const checkPassword = (email, password) => {
   if (users[getIdByEmail(email)].password === password) {
     return true;
@@ -63,6 +74,7 @@ const checkPassword = (email, password) => {
   return false
 };
 
+// gets email registered to given id
 const getEmailById = (id) => {
   let user = users[id];
   if (!user) {
@@ -71,6 +83,7 @@ const getEmailById = (id) => {
   return user.email;
 };
 
+// gets id registered to email
 const getIdByEmail = (email) => {
   let id = undefined;
   for (user in users) {
@@ -79,6 +92,17 @@ const getIdByEmail = (email) => {
     }
   }
   return id;
+};
+
+// generates list of urls associated with given id
+const urlsForUser = (id) => {
+  const output = {};
+  for (url in urlDatabase) {
+    if (urlDatabase[url].userId == id) {
+      output[url] = urlDatabase[url];
+    }
+  }
+  return output;
 };
 
 // stand-in root path / home-page
@@ -100,8 +124,8 @@ app.get('/login', (req, res) => {
 // passes defined var to ejs template, displays with .render
 app.get('/urls', (req, res) => {
   let templateVars = {
-    urls: urlDatabase,
-    userEmail: getEmailById(req.cookies["user_id"])
+    userEmail: getEmailById(req.cookies["user_id"]),
+    urls: urlsForUser(req.cookies["user_id"])
   };
   res.render("urls_index", templateVars);
 });
@@ -111,15 +135,20 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     userEmail: getEmailById(req.cookies["user_id"])
   };
+  if (templateVars.userEmail === undefined) {
+    res.redirect('/login');
+    return;
+  }
   res.render("urls_new", templateVars);
 });
 
 // shows a page unique to each shortened url
 app.get("/urls/:id", (req, res) => {
   let templateVars = {
-    shortURL: req.params.id,
+    shortUrl: req.params.id,
     urls: urlDatabase,
-    userEmail: getEmailById(req.cookies["user_id"])
+    userEmail: getEmailById(req.cookies["user_id"]),
+    userId: req.cookies["user_id"]
   };
   res.render("urls_show", templateVars);
 });
@@ -174,27 +203,38 @@ app.post("/login", (req, res) => {
 // allows form fillout to update urlDatabase
 app.post("/urls/:id", (req, res) => {
   let longURL = addProtocol(req.body.longURL);
-  urlDatabase[req.params.id] = longURL;
-  res.redirect('/urls');
+  if (urlDatabase[req.params.id].userId == req.cookies["user_id"]) {
+    urlDatabase[req.params.id].url = longURL;
+    res.redirect('/urls');
+  } else {
+    res.status(400).send("You do not have permission to edit that URL")
+  }
 });
 
 // handles post requests from new url form
 app.post("/urls", (req, res) => {
   const shortened = generateRandomString();
   let longURL = addProtocol(req.body.longURL);
-  urlDatabase[shortened] = longURL;
+  urlDatabase[shortened] = {
+    url: longURL,
+    userId: req.cookies["user_id"]
+  };
   res.redirect(`/urls/${shortened}`);
 });
 
 // allows button to delete from urlDatabase
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect('http://localhost:8080/urls');
+  if (urlDatabase[req.params.id].userId === req.cookies["user_id"]) {
+    delete urlDatabase[req.params.id];
+    res.redirect('http://localhost:8080/urls');
+  } else {
+    res.status(400).send("You do not have permission to delete that URL")
+  }
 });
 
 // redirects to website stored in database
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
+  let longURL = urlDatabase[req.params.shortURL].url;
   res.redirect(longURL);
 });
 

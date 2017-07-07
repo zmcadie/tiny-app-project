@@ -5,14 +5,19 @@
 </head>
 <body>
   <% include partials/_header %>
+  <% if (urls[shortUrl].userId === userId) { %>
+    <h2>shortURL: <%=`${shortUrl}` %></h2>
 
-  <h2>shortURL: <%=`${shortURL}` %></h2>
-
-  <form action="/urls/<%= shortURL %>" method="POST">
-        <input id="longURL" type="text" name="longURL" value="<%= urls[shortURL] %>" style="width: 300px">
-        <input type="submit" value="Update">
-      </form>
-
+    <form action="/urls/<%= shortUrl %>" method="POST">
+      <input id="longURL" type="text" name="longURL" value="<%= urls[shortUrl].url %>" style="width: 300px">
+      <input type="submit" value="Update">
+    </form>
+  <% } else { %>
+    <h4>Sorry, you do not have permission to view this page.</h4>
+    <% if (!userId) { %>
+      <h4>Please log in</h4>
+    <% } %>
+  <% } %>
   <% include partials/_footer %>
 </body>
 </html>
