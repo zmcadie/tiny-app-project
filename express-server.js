@@ -273,7 +273,7 @@ app.post("/urls", (req, res) => {
 
 // allows button to delete from urlDatabase
 app.post("/urls/:id/delete", (req, res) => {
-  if (!req.params.userId) {
+  if (!req.session.userId) {
     res.status(401).send("You must be logged in to do that!");
     return;
   } else if (urlDatabase[req.params.id].userId === req.session.userId) {
