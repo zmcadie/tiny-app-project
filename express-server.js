@@ -8,6 +8,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 // allows use of cookies
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
+// includes bcrypt
+const bcrypt = require('bcrypt');
 
 // enables ejs templates (using render, etc...)
 app.set('view engine', 'ejs');
@@ -29,7 +31,7 @@ const users = {
   01: {
     id: 01,
     email: 'admin@tinyapp.com',
-    password: 'admin'
+    password: bcrypt.hashSync('admin', 10)
   }
 };
 
@@ -68,7 +70,7 @@ const isUser = (email) => {
 
 // checks if given email and password match
 const checkPassword = (email, password) => {
-  if (users[getIdByEmail(email)].password === password) {
+  if (bcrypt.compareSync(password, users[getIdByEmail(email)].password)) {
     return true;
   }
   return false
@@ -167,7 +169,7 @@ app.post("/register", (req, res) => {
     const newUser = {
       id: generateRandomString(),
       email: req.body.email,
-      password: req.body.password
+      password: bcrypt.hashSync(req.body.password, 10)
     };
     users[newUser.id] = newUser;
     res.cookie('user_id', newUser.id);
@@ -226,7 +228,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   if (urlDatabase[req.params.id].userId === req.cookies["user_id"]) {
     delete urlDatabase[req.params.id];
-    res.redirect('http://localhost:8080/urls');
+    res.redirect('/urls');
   } else {
     res.status(400).send("You do not have permission to delete that URL")
   }
